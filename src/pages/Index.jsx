@@ -9,7 +9,7 @@ const INITIAL_DIRECTION = { x: 1, y: 0 };
 
 const Index = () => {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
-  const [food, setFood] = useState(generateFood());
+  const [food, setFood] = useState({ x: 0, y: 0 });
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [gameOver, setGameOver] = useState(false);
   const boardRef = useRef(null);
@@ -24,6 +24,10 @@ const Index = () => {
     } while (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
     return newFood;
   };
+
+  useEffect(() => {
+    setFood(generateFood());
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
