@@ -3,6 +3,7 @@ import { Container, Box, Button, VStack, Input, Text, HStack } from "@chakra-ui/
 import { Document, Page, pdfjs } from "react-pdf";
 import { saveAs } from "file-saver";
 import { translateText } from "../utils/translate";
+import { PDFDocument, rgb } from 'pdf-lib';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
@@ -11,6 +12,7 @@ const PdfUpload = () => {
   const [numPages, setNumPages] = useState(null);
   const [translatedPages, setTranslatedPages] = useState([]);
   const [message, setMessage] = useState("");
+  const [translatedPdfUrl, setTranslatedPdfUrl] = useState(null);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -38,6 +40,22 @@ const PdfUpload = () => {
         translatedPages.push(translatedText);
       }
       setTranslatedPages(translatedPages);
+
+      // Create a new PDF with the translated text
+      const newPdfDoc = await PDFDocument.create();
+      for (const translatedText of translatedPages) {
+        const page = newPdfDoc.addPage();
+        const { width, height } = page.getSize();
+        page.drawText(translatedText, {
+          x: 50,
+          y: height - 50,
+          size: 12,
+          color: rgb(0, 0, 0),
+        });
+      }
+      const pdfBytes = await newPdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      setTranslatedPdfUrl(URL.createObjectURL(blob));
     };
     reader.readAsArrayBuffer(file);
   };
@@ -77,6 +95,12 @@ const PdfUpload = () => {
             )}
           </Box>
         </HStack>
+        {translatedPdfUrl && (
+          <Box width="100%" mt={4}>
+            <Text>Translated PDF:</Text>
+            <iframe src={translatedPdfUrl} width="100%" height="600px" />
+          </Box>
+        )}
         {translatedPages.length > 0 && (
           <Button onClick={handleDownload} mt={4}>Download Translated PDF</Button>
         )}
