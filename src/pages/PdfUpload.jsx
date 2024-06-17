@@ -1,8 +1,15 @@
 import React, { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import { pdfjsWorker } from "react-pdf/dist/esm/entry.webpack";
+import { translateText } from "../utils/translate";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 import { Container, Box, Button, VStack, Input, Text } from "@chakra-ui/react";
 
 const PdfUpload = () => {
   const [file, setFile] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [translatedPages, setTranslatedPages] = useState([]);
   const [message, setMessage] = useState("");
 
   const handleFileChange = (event) => {
@@ -16,23 +23,23 @@ const PdfUpload = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const typedArray = new Uint8Array(reader.result);
+      const pdf = await pdfjs.getDocument(typedArray).promise;
+      setNumPages(pdf.numPages);
 
-    try {
-      const response = await fetch("/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        setMessage("File uploaded successfully!");
-      } else {
-        setMessage("File upload failed. Please try again.");
+      const translatedPages = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const textItems = textContent.items.map((item) => item.str).join(" ");
+        const translatedText = await translateText(textItems, "zh");
+        translatedPages.push(translatedText);
       }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      setMessage("An error occurred during file upload. Please try again.");
+      setTranslatedPages(translatedPages);
+    };
+    reader.readAsArrayBuffer(file);
     }
   };
 
@@ -44,6 +51,15 @@ const PdfUpload = () => {
           <Button type="submit" mt={4}>Upload PDF</Button>
         </Box>
         {message && <Text>{message}</Text>}
+      {translatedPages.length > 0 && (
+          <Box width="100%">
+            {translatedPages.map((page, index) => (
+              <Box key={index} p={4} border="1px solid black" mb={4}>
+                <Text>{page}</Text>
+              </Box>
+            ))}
+          </Box>
+        )}
       </VStack>
     </Container>
   );
