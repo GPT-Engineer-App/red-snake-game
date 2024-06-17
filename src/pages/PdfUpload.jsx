@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import { Container, Box, Button, VStack, Input, Text } from "@chakra-ui/react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { pdfjsWorker } from "react-pdf/dist/esm/entry.webpack";
 import { translateText } from "../utils/translate";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-import { Container, Box, Button, VStack, Input, Text } from "@chakra-ui/react";
 
 const PdfUpload = () => {
   const [file, setFile] = useState(null);
@@ -40,7 +40,6 @@ const PdfUpload = () => {
       setTranslatedPages(translatedPages);
     };
     reader.readAsArrayBuffer(file);
-    }
   };
 
   return (
@@ -51,7 +50,7 @@ const PdfUpload = () => {
           <Button type="submit" mt={4}>Upload PDF</Button>
         </Box>
         {message && <Text>{message}</Text>}
-      {translatedPages.length > 0 && (
+        {translatedPages.length > 0 && (
           <Box width="100%">
             {translatedPages.map((page, index) => (
               <Box key={index} p={4} border="1px solid black" mb={4}>
