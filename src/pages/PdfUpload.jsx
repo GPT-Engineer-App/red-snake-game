@@ -4,7 +4,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 
 import { translateText } from "../utils/translate";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
 
 const PdfUpload = () => {
   const [file, setFile] = useState(null);
