@@ -4,7 +4,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { saveAs } from "file-saver";
 import { translateText } from "../utils/translate";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const PdfUpload = () => {
   const [file, setFile] = useState(null);
@@ -26,7 +26,7 @@ const PdfUpload = () => {
     const reader = new FileReader();
     reader.onload = async () => {
       const typedArray = new Uint8Array(reader.result);
-      const pdf = await pdfjs.getDocument(typedArray).promise;
+      const pdf = await pdfjs.getDocument({ data: typedArray }).promise;
       setNumPages(pdf.numPages);
 
       const translatedPages = [];
@@ -58,7 +58,7 @@ const PdfUpload = () => {
         <HStack spacing={4} width="100%">
           <Box width="50%">
             {file && (
-              <Document file={file}>
+              <Document file={file} onLoadError={(error) => setMessage(`Failed to load PDF file: ${error.message}`)}>
                 {Array.from(new Array(numPages), (el, index) => (
                   <Page key={`page_${index + 1}`} pageNumber={index + 1} />
                 ))}
