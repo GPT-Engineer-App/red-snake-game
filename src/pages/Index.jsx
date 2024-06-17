@@ -14,6 +14,17 @@ const Index = () => {
   const [gameOver, setGameOver] = useState(false);
   const boardRef = useRef(null);
 
+  const generateFood = () => {
+    let newFood;
+    do {
+      newFood = {
+        x: Math.floor(Math.random() * BOARD_SIZE),
+        y: Math.floor(Math.random() * BOARD_SIZE),
+      };
+    } while (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
+    return newFood;
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
@@ -70,17 +81,6 @@ const Index = () => {
 
   const isCollision = (snake, head) => {
     return snake.some((segment) => segment.x === head.x && segment.y === head.y);
-  };
-
-  const generateFood = () => {
-    let newFood;
-    do {
-      newFood = {
-        x: Math.floor(Math.random() * BOARD_SIZE),
-        y: Math.floor(Math.random() * BOARD_SIZE),
-      };
-    } while (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
-    return newFood;
   };
 
   const resetGame = () => {
