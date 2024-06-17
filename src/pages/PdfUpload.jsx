@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Container, Box, Button, VStack, Input, Text } from "@chakra-ui/react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { pdfjsWorker } from "react-pdf/dist/esm/entry.webpack";
+
 import { translateText } from "../utils/translate";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const PdfUpload = () => {
   const [file, setFile] = useState(null);
