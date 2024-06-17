@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Container, Box, Button, VStack, Input, Text } from "@chakra-ui/react";
+import { Container, Box, Button, VStack, Input, Text, HStack } from "@chakra-ui/react";
 import { Document, Page, pdfjs } from "react-pdf";
-
+import { saveAs } from "file-saver";
 import { translateText } from "../utils/translate";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
@@ -42,6 +42,11 @@ const PdfUpload = () => {
     reader.readAsArrayBuffer(file);
   };
 
+  const handleDownload = () => {
+    const blob = new Blob(translatedPages, { type: "application/pdf" });
+    saveAs(blob, "translated.pdf");
+  };
+
   return (
     <Container centerContent>
       <VStack spacing={4} width="100%">
@@ -50,14 +55,30 @@ const PdfUpload = () => {
           <Button type="submit" mt={4}>Upload PDF</Button>
         </Box>
         {message && <Text>{message}</Text>}
-        {translatedPages.length > 0 && (
-          <Box width="100%">
-            {translatedPages.map((page, index) => (
-              <Box key={index} p={4} border="1px solid black" mb={4}>
-                <Text>{page}</Text>
-              </Box>
-            ))}
+        <HStack spacing={4} width="100%">
+          <Box width="50%">
+            {file && (
+              <Document file={file}>
+                {Array.from(new Array(numPages), (el, index) => (
+                  <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+                ))}
+              </Document>
+            )}
           </Box>
+          <Box width="50%">
+            {translatedPages.length > 0 && (
+              <Box width="100%">
+                {translatedPages.map((page, index) => (
+                  <Box key={index} p={4} border="1px solid black" mb={4}>
+                    <Text>{page}</Text>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+        </HStack>
+        {translatedPages.length > 0 && (
+          <Button onClick={handleDownload} mt={4}>Download Translated PDF</Button>
         )}
       </VStack>
     </Container>
